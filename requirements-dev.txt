@@ -1,0 +1,7 @@
+# Development / test dependencies (installed on top of requirements.txt).
+-r requirements.txt
+
+pytest==9.1.1
+httpx==0.28.1
+fakeredis==2.36.2
+ruff==0.15.20

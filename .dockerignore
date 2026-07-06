@@ -1,0 +1,15 @@
+# Backend build context is the repo root; keep the image lean.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.db
+*.sqlite3
+.env
+tests/
+loadtest/
+dashboard/
+.git/
+*.md

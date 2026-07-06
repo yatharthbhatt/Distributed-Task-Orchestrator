@@ -1,0 +1,25 @@
+# Runtime dependencies (pinned). Verified importable on Python 3.14 (local venv)
+# and used on Python 3.12-slim inside Docker.
+
+# --- API / producer layer ---
+fastapi==0.139.0
+uvicorn==0.50.0
+sse-starlette==3.4.5
+
+# --- task queue ---
+celery==5.5.3
+redis==5.2.1
+
+# --- persistence ---
+SQLAlchemy==2.0.51
+# PostgreSQL driver (Docker mode). Local mode uses the stdlib sqlite3 driver, so
+# this is only exercised in the container; binary wheels avoid a build toolchain.
+psycopg[binary]==3.2.10
+
+# --- config / validation ---
+pydantic==2.13.4
+pydantic-settings==2.14.2
+python-dotenv==1.2.2
+
+# --- monitoring ---
+flower==2.0.1

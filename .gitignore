@@ -1,0 +1,29 @@
+# ---- Python ----
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# ---- databases (local SQLite) ----
+*.db
+*.sqlite3
+.pytest_orchestrator.db
+orchestrator.db
+
+# ---- env ----
+.env
+
+# ---- Node / Next.js ----
+node_modules/
+dashboard/.next/
+dashboard/out/
+dashboard/build/
+dashboard/.turbo/
+next-env.d.ts
+
+# ---- misc ----
+.DS_Store
+*.log
