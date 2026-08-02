@@ -253,7 +253,10 @@ All settings have per-mode defaults (see `.env.example`); an empty `.env` is val
 - **`docker compose up` first run is slow** — it builds images and pulls Redis/Postgres; retry
   waits are handled by healthchecks.
 
----
+
+<img width="1919" height="1079" alt="Screenshot 2026-08-02 174211" src="https://github.com/user-attachments/assets/403af15a-4d70-4c20-8d91-acdefed80979" />
+<img width="1438" height="684" alt="Screenshot 2026-08-02 174254" src="https://github.com/user-attachments/assets/c5337481-d656-4e99-abd6-6214f8be0846" />
+
 
 ## Notes
 
