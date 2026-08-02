@@ -3,8 +3,12 @@
  * Base URL is configurable so the dashboard works in local dev and in Docker.
  */
 
+// 127.0.0.1 rather than localhost on purpose: uvicorn binds IPv4 loopback by
+// default, but browsers resolving "localhost" may try ::1 first and get a
+// connection refused. Naming the IPv4 address takes DNS out of the equation.
+// Docker mode overrides this via NEXT_PUBLIC_API_URL at build time.
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://127.0.0.1:8000";
 
 export type JobStatus = "PENDING" | "STARTED" | "RETRY" | "SUCCESS" | "FAILURE";
 

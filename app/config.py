@@ -57,7 +57,11 @@ class Settings(BaseSettings):
     )
 
     # ------------------------------------------------------------------ api
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    # Both loopback spellings: the dashboard is reachable as either, and the
+    # browser's choice determines the Origin header the API has to accept.
+    cors_origins: list[str] = Field(
+        default_factory=lambda: ["http://localhost:3000", "http://127.0.0.1:3000"]
+    )
     api_title: str = "Distributed Task Orchestrator API"
 
     # ------------------------------------------------------------------ derived defaults

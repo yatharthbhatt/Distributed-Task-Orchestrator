@@ -3,61 +3,311 @@
 @tailwind utilities;
 
 /*
-  Design tokens from the data-viz reference palette. Both modes are authored
-  (dark is not an auto-flip): the status hues are CVD-validated and every status
-  is paired with a text label in the UI, so meaning is never color-alone.
-*/
-:root {
-  --page: #f9f9f7;
-  --surface: #fcfcfb;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --grid: #e1e0d9;
-  --baseline: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.1);
+  ── OrchestraX — liquid glass, light ─────────────────────────────────────────
+  Frosted white panels floating over a soft pastel aurora. The design commits to
+  a single light look: transparency only reads as "glass" when there is something
+  luminous behind it, so the backdrop *is* the design.
 
-  /* status palette (fixed, never themed) */
-  --status-success: #0ca30c;
-  --status-failure: #d03b3b;
-  --status-retry: #fab219;
-  --status-started: #2a78d6;
-  --status-pending: #898781;
+  Legibility rules that survive the transparency:
+    · every surface blurs + saturates what sits behind it, so text keeps contrast
+    · pastels stay in the backdrop; anything carrying meaning uses the saturated
+      status palette below, all of which clears 4.5:1 on the frosted surface
+    · status hues are separated by lightness as well as hue, and are ALWAYS paired
+      with a text label — meaning is never carried by color alone
+*/
+
+:root {
+  /* backdrop — pale canvas, pastel light sources */
+  --canvas: #f2f5fd;
+  --aurora-1: #a5b4fc; /* periwinkle */
+  --aurora-2: #5eead4; /* mint       */
+  --aurora-3: #f9a8d4; /* blush      */
+  --aurora-4: #93c5fd; /* sky        */
+
+  /* glass */
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-hover: rgba(255, 255, 255, 0.82);
+  --rim: rgba(255, 255, 255, 0.9);
+  --rim-bright: rgba(255, 255, 255, 1);
+  --hairline: rgba(16, 21, 39, 0.08);
+
+  /* surfaces layered on top of glass */
+  --frost: rgba(255, 255, 255, 0.88); /* sticky headers, tooltips */
+  --tint: rgba(255, 255, 255, 0.5); /* inset wells             */
+  --track: rgba(16, 21, 39, 0.09); /* empty bars, gauge track  */
+  --rule: rgba(16, 21, 39, 0.11); /* dividers                 */
+
+  /* type — explicit values, not alpha, so contrast is predictable on glass */
+  --text-primary: #101527; /* ~16:1 */
+  --text-secondary: #4a5265; /* ~7.9:1 */
+  --text-muted: #6b7386; /* ~5.0:1 */
+
+  /* chart furniture */
+  --grid: rgba(16, 21, 39, 0.07);
+  --baseline: rgba(16, 21, 39, 0.16);
+
+  /* status palette — never used without an accompanying text label */
+  --status-success: #06895d;
+  --status-failure: #d1233c;
+  --status-retry: #9a6400;
+  --status-started: #1d4ed8;
+  --status-pending: #667085;
 
   /* single categorical series for throughput */
-  --series-1: #2a78d6;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --page: #0d0d0d;
-    --surface: #1a1a19;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --grid: #2c2c2a;
-    --baseline: #383835;
-    --border: rgba(255, 255, 255, 0.1);
-
-    --status-started: #3987e5;
-    --series-1: #3987e5;
-  }
+  --series-1: #4f46e5;
 }
 
 html,
 body {
-  background: var(--page);
+  background: var(--canvas);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+/* ── Ambient backdrop ────────────────────────────────────────────────────────
+   Four oversized, heavily blurred pastel blobs drift on long offset cycles.
+   Fixed and pointer-events:none, so they never interfere with the UI above. */
+
+.aurora {
+  position: fixed;
+  inset: -25vmax;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(85px);
+  opacity: 0.72;
+  will-change: transform;
+}
+
+/* Spread across all four quadrants — a light canvas swallows colour far more
+   readily than a dark one, so the blobs have to reach the corners. */
+.blob-1 {
+  width: 48vmax;
+  height: 48vmax;
+  top: 4%;
+  left: 2%;
+  background: var(--aurora-1);
+  animation: drift-1 34s ease-in-out infinite;
+}
+.blob-2 {
+  width: 44vmax;
+  height: 44vmax;
+  top: 38%;
+  left: 58%;
+  background: var(--aurora-2);
+  animation: drift-2 41s ease-in-out infinite;
+}
+.blob-3 {
+  width: 40vmax;
+  height: 40vmax;
+  top: 62%;
+  left: 20%;
+  background: var(--aurora-3);
+  animation: drift-3 47s ease-in-out infinite;
+}
+.blob-4 {
+  width: 38vmax;
+  height: 38vmax;
+  top: 0%;
+  left: 66%;
+  background: var(--aurora-4);
+  animation: drift-4 38s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(14vmax, 9vmax, 0) scale(1.14);
+  }
+}
+@keyframes drift-2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  50% {
+    transform: translate3d(-16vmax, -7vmax, 0) scale(0.92);
+  }
+}
+@keyframes drift-3 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+  }
+  50% {
+    transform: translate3d(11vmax, -12vmax, 0) scale(1.2);
+  }
+}
+@keyframes drift-4 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-10vmax, 13vmax, 0) scale(0.9);
+  }
+}
+
+/* Fine grain — multiplied, so on a light canvas it reads as paper tooth rather
+   than the lit haze an overlay blend would give. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Inverse vignette: washes the canvas colour back toward white at the edges so
+   the pastels never get saturated enough to fight the text. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(130% 100% at 50% 0%, transparent 48%, rgba(248, 250, 255, 0.45) 100%);
+}
+
+/* ── Glass primitives ───────────────────────────────────────────────────────── */
+
+.glass {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--rim);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 14px 36px -20px rgba(24, 34, 76, 0.34);
+}
+
+/* Specular edge — a bright top-left rim that fades away, the way light catches a
+   real pane. Painted as a masked border so it never tints the fill itself. */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    var(--rim-bright),
+    transparent 42%,
+    transparent 62%,
+    rgba(255, 255, 255, 0.55)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass-inset {
+  background: var(--tint);
+  border: 1px solid var(--hairline);
   border-radius: 14px;
+}
+
+.glass-hover {
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.glass-hover:hover {
+  background: var(--glass-hover);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+/* Frosted pill used for live badges and status chips. */
+.pill {
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Slow breathing pulse on the live indicator. */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+.breathe {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+/* Scrollbars that belong to the glass rather than to the OS. */
+.scroll-glass {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 21, 39, 0.2) transparent;
+}
+.scroll-glass::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.scroll-glass::-webkit-scrollbar-thumb {
+  background: rgba(16, 21, 39, 0.2);
+  border-radius: 999px;
+}
+.scroll-glass::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Native controls will not take glass styling; recolor what they do expose. */
+input[type="checkbox"] {
+  accent-color: var(--series-1);
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+input::placeholder {
+  color: var(--text-muted);
+}
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(79, 70, 229, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob,
+  .breathe {
+    animation: none;
+  }
 }
